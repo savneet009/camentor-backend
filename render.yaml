@@ -1,0 +1,36 @@
+services:
+  - type: web
+    name: camentor-backend
+    runtime: node
+    rootDir: camentor-backend
+    plan: free
+    buildCommand: npm ci
+    startCommand: npm start
+    healthCheckPath: /healthz
+    envVars:
+      - key: NODE_VERSION
+        value: 20.11.1
+      - key: NODE_ENV
+        value: production
+      - key: TRUST_PROXY
+        value: "1"
+      - key: JSON_LIMIT
+        value: 20mb
+      - key: RATE_LIMIT_WINDOW_MS
+        value: "60000"
+      - key: RATE_LIMIT_MAX
+        value: "180"
+      - key: NOTES_UPLOAD_WINDOW_MS
+        value: "600000"
+      - key: NOTES_UPLOAD_MAX
+        value: "20"
+      - key: NOTES_MAX_UPLOAD_BYTES
+        value: "15728640"
+      - key: ALLOWED_ORIGINS
+        sync: false
+      - key: MONGO_URI
+        sync: false
+      - key: JWT_SECRET
+        generateValue: true
+      - key: GEMINI_API_KEY
+        sync: false

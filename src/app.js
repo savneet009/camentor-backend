@@ -13,23 +13,22 @@ import icaiRoutes from "./routes/icaiRoutes.js";
 import notesRoutes from "./routes/notesRoutes.js";
 import videosRoutes from "./routes/videosRoutes.js";
 import { createRateLimit } from "./middleware/rateLimit.js";
+import { env } from "./config/env.js";
 
 const app = express();
 
-const allowedOrigins = (process.env.ALLOWED_ORIGINS || "")
-  .split(",")
-  .map((x) => x.trim())
-  .filter(Boolean);
+app.set("trust proxy", env.trustProxy);
 
 app.use(cors({
   origin(origin, cb) {
     if (!origin) return cb(null, true);
-    if (allowedOrigins.length === 0) return cb(null, true);
-    if (allowedOrigins.includes(origin)) return cb(null, true);
+    if (env.allowedOrigins.length === 0) return cb(null, true);
+    if (env.allowedOrigins.includes(origin)) return cb(null, true);
     return cb(new Error("CORS origin not allowed"));
   },
   credentials: true,
 }));
+app.options("*", cors());
 
 app.use((req, res, next) => {
   res.setHeader("X-Content-Type-Options", "nosniff");
@@ -39,11 +38,22 @@ app.use((req, res, next) => {
 });
 
 app.use(createRateLimit({
-  windowMs: Number(process.env.RATE_LIMIT_WINDOW_MS || 60_000),
-  max: Number(process.env.RATE_LIMIT_MAX || 180),
+  windowMs: env.rateLimitWindowMs,
+  max: env.rateLimitMax,
 }));
 
-app.use(express.json({ limit: process.env.JSON_LIMIT || "20mb" }));
+app.use(express.json({ limit: env.jsonLimit }));
+app.use(express.urlencoded({ extended: true, limit: env.jsonLimit }));
+
+app.get("/healthz", (req, res) => {
+  res.status(200).json({
+    ok: true,
+    service: "camentor-backend",
+    uptime: process.uptime(),
+    timestamp: new Date().toISOString(),
+    environment: env.nodeEnv,
+  });
+});
 
 app.use("/api/auth", authRoutes);
 app.use("/api/users", userRoutes);
@@ -58,7 +68,11 @@ app.use("/api/videos", videosRoutes);
 app.use("/api/dashboard", dashboardRoutes);
 
 app.get("/", (req,res)=>{
- res.send("CA Mentor Backend Running");
+ res.json({
+  ok: true,
+  message: "CA Mentor Backend Running",
+  docs: "/healthz",
+ });
 });
 
 export default app;
