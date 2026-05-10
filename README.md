@@ -27,7 +27,7 @@ Common production values:
 
 - `NODE_ENV=production`
 - `PORT=10000` on Render is provided automatically, so you do not need to hardcode it
-- `ALLOWED_ORIGINS=https://your-frontend.vercel.app`
+- `ALLOWED_ORIGINS=https://camentor.vercel.app`
 - `TRUST_PROXY=1`
 
 Optional AI integration:
@@ -46,7 +46,7 @@ Use the included [render.yaml](/Users/admin/Desktop/vs%20code%20/ca-mentor/camen
 - Start command: `npm start`
 - Health check path: `/healthz`
 
-After deploy, set `ALLOWED_ORIGINS` to your frontend Vercel URL and any custom domain you attach.
+After deploy, set `ALLOWED_ORIGINS` to `https://camentor.vercel.app` and any custom domain you attach.
 
 ## Health Check
 
